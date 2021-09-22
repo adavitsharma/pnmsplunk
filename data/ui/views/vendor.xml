@@ -1,0 +1,83 @@
+<form>
+  <label>vendor</label>
+  <search id="base_search">
+    <query>index=sales source="vendor_sales.log" |table Code ,   VendorID, AcctID
+      
+    </query>
+  </search>
+  <description>sales</description>
+  <fieldset submitButton="false">
+    <input type="dropdown" token="code" searchWhenChanged="true">
+      <label>code</label>
+      <search base="base_search">
+        <query>|stats count by Code
+          
+        </query>
+      </search>
+      <choice value="*">All</choice>
+      <default>*</default>
+      <initialValue>*</initialValue>
+      <fieldForLabel>code</fieldForLabel>
+      <fieldForValue>Code</fieldForValue>
+    </input>
+    <input type="dropdown" token="vendorid" searchWhenChanged="true">
+      <label>vendorid</label>
+      <search base="base_search">
+        <query>|stats count by VendorID
+          
+        </query>
+      </search>
+      <choice value="*">All</choice>
+      <default>*</default>
+      <initialValue>*</initialValue>
+      <fieldForLabel>vendorid</fieldForLabel>
+      <fieldForValue>VendorID</fieldForValue>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <chart>
+        <title>Code</title>
+        <search base="base_search">
+          <query>|search Code=$code$|stats count by Code</query>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">none</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>vendoridbar</title>
+        <search base="base_search">
+          <query>|stats count by VendorID</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="charting.chart">column</option>
+        <option name="charting.drilldown">none</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>vendorid</title>
+        <search base="base_search">
+          <query>|search VendorID=$vendorid$|stats count by VendorID</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="charting.chart">column</option>
+        <option name="charting.drilldown">none</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>CodeAll</title>
+        <search base="base_search">
+          <query>|stats count by Code</query>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">none</option>
+      </chart>
+    </panel>
+  </row>
+</form>
