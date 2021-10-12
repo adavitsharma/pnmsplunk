@@ -1,0 +1,76 @@
+40.121.247.122 - CM - splunk/Splunk@8335866647
+
+On deployer command for pushing the app to searchhead:----
+splunk apply shcluster-bundle -target https://10.138.0.2:8089 -auth admin:changeme
+
+Deplyer server:- cd /opt/splunk/etc/sysstem/local/server.conf
+
+[shclustering]
+pass4SymmKey = $7$frewOmVWDwH+3a105ouSDrDFk6eCoATcck38IFdmqWWWP/ba
+shcluster_label = demo
+
+-------------------------------------------------------------------------------------------------
+
+Search head :- cd /opt/splunk/etc/sysstem/local/server.conf
+[clustering]
+master_uri = https://10.182.0.4:8089
+mode = searchhead
+pass4SymmKey = $7$xxPTxeG6Dq9XHFKcsua/0/jUDWrIg0mrr1MBsvBdmiytl0t5
+[replication_port://8080]
+[shclustering]
+conf_deploy_fetch_url = http://10.138.0.5:8089
+disabled = 0
+mgmt_uri = https://10.138.0.2:8089
+pass4SymmKey = $7$pR/Eap6VEtz1zxKJ8UC/kDWC+XKzOGk3SrbECFg8z8Q3kXQ/
+replication_factor = 2
+shcluster_label = demo
+id = 7EF09F73-F2C8-4B8F-B061-69C40BD3976F
+[root@splunksh2 local]# 
+
+-----------------------------------------------------------------------------------------------------------
+Cluster master :- /opt/splunk/etc/master-apps/_cluster/local/
+                 here create folder(like:test)after that we will create indexes.conf
+                 now  vi indexes.conf
+here create index like,
+
+[window]
+coldPath = $SPLUNK_DB/window/colddb
+enableDataIntegrityControl = 0
+enableTsidxReduction = 0
+homePath = $SPLUNK_DB/window/db
+maxTotalDataSizeMB = 512000
+thawedPath = $SPLUNK_DB/window/thaweddb
+
+Now push the index on indexer via command:=
+
+/opt/splunk/bin/splunk validate cluster-bundle --check-restartc/opt/splunk/bin/splunk
+/opt/splunk/bin/splunk apply cluster-bundle
+/opt/splunk/bin/splunk show cluster-bundle-status
+
+----------------------------------------------------------------------------------------------------------------------
+Deployement server and forwarder:-
+
+universal forwarder:- cd /opt/splunkforwarder/bin/splunk
+                     ./splunk set deploy-poll 10.138.0.4:8089
+Heavy forwarder:- cd /opt/splunk/bin/
+                   ./splunk set deploy-poll (deployment server:8089)
+     How to check:-
+                     cd /opt/splunk/etc/system/local
+                      
+                      click on  vi deployementclient.conf					 
+
+deployment servr - changeme123
+uf changeme@123
+fwd2:-changeme@123
+
+[tcpout]
+defaultGroup = default-autolb-group
+[tcpout-server://10.182.0.8:9997]
+[tcpout:default-autolb-group]
+disabled = false
+server = 10.182.0.8:9997,10.182.0.5:9997,10.182.0.9:9997
+[tcpout-server://10.182.0.5:9997]
+[tcpout-server://10.182.0.9:9997]
+
+
+./splunk add forward-server 10.182.0.8:9997,10.182.0.5:9997					  
