@@ -1,4 +1,4 @@
-40.121.247.122 - CM - splunk/Splunk@8335866647
+#40.121.247.122 - CM - splunk/Splunk@8335866647
 
 On deployer command for pushing the app to searchhead:----
 splunk apply shcluster-bundle -target https://10.138.0.2:8089 -auth admin:changeme
